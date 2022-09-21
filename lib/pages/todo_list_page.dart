@@ -1,9 +1,17 @@
 import 'package:flutter/material.dart';
 
-class TodoListPage extends StatelessWidget {
+class TodoListPage extends StatefulWidget {
   TodoListPage({Key? key}) : super(key: key);
 
-  final TextEditingController _addControle = TextEditingController();
+  @override
+  State<TodoListPage> createState() => _TodoListPageState();
+}
+
+class _TodoListPageState extends State<TodoListPage> {
+  final TextEditingController _addController = TextEditingController();
+
+  List<String> todo = [];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -14,7 +22,7 @@ class TodoListPage extends StatelessWidget {
           Row(children: [
             Expanded(
               child: TextField(
-                controller: _addControle,
+                controller: _addController,
                 keyboardType: TextInputType.text,
                 decoration: InputDecoration(
                     hoverColor: Color(0xff00d7f3),
@@ -34,7 +42,13 @@ class TodoListPage extends StatelessWidget {
               width: 8,
             ),
             ElevatedButton(
-              onPressed: () => {},
+              onPressed: () {
+                String text = _addController.text;
+                print(todo);
+                setState(() {
+                  todo.add(text);
+                });
+              },
               style: ElevatedButton.styleFrom(
                   backgroundColor: Color(0xff00d7f3),
                   padding: EdgeInsets.all(14)),
@@ -43,6 +57,17 @@ class TodoListPage extends StatelessWidget {
           ]),
           SizedBox(
             height: 16,
+          ),
+          SizedBox(
+            height: 200,
+            child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: todo.length,
+                itemBuilder: (context, index) => ListTile(
+                      title: Text(todo[index]),
+                      style: ListTileStyle.list,
+                      onTap: (() => print(todo[index])),
+                    )),
           ),
           Row(
             children: [
