@@ -1,11 +1,10 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:todo_list/model/Todo.dart';
+import 'package:todo_list/repository/todo_repository.dart';
 import 'package:todo_list/widgets/todo_list_item.dart';
 
 class TodoListPage extends StatefulWidget {
-  TodoListPage({Key? key}) : super(key: key);
+  const TodoListPage({Key? key}) : super(key: key);
 
   @override
   State<TodoListPage> createState() => _TodoListPageState();
@@ -13,14 +12,26 @@ class TodoListPage extends StatefulWidget {
 
 class _TodoListPageState extends State<TodoListPage> {
   final TextEditingController _addController = TextEditingController();
-
+  final TodoRepository todoRepository = TodoRepository();
   List<Todo> todo = [];
+
+  @override
+  void initState() {
+    super.initState();
+
+    todoRepository.getTodoList().then((value) {
+      setState(() {
+        todo = value;
+      });
+    });
+  }
 
   void onDelete(Todo item) {
     int deletedTodoPos = todo.indexOf(item);
     setState(() {
       todo.remove(item);
     });
+    todoRepository.saveTodoList(todo);
     ScaffoldMessenger.of(context).clearSnackBars();
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: SizedBox(
@@ -38,7 +49,6 @@ class _TodoListPageState extends State<TodoListPage> {
           setState(() {
             todo.insert(deletedTodoPos, item);
           });
-          print('deletado aqui ${todo.indexOf(item)}');
         },
       ),
       duration: const Duration(seconds: 5),
@@ -54,6 +64,7 @@ class _TodoListPageState extends State<TodoListPage> {
         errorText = false;
       });
       _addController.clear();
+      todoRepository.saveTodoList(todo);
     }
   }
 
@@ -165,6 +176,7 @@ class _TodoListPageState extends State<TodoListPage> {
                                   onPressed: () {
                                     setState(() {
                                       todo.clear();
+                                      todoRepository.saveTodoList(todo);
                                     });
                                     Navigator.of(context).pop();
                                   },
