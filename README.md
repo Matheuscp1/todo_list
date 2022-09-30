@@ -1,16 +1,5 @@
 # todo_list
 
-A new Flutter project.
+Lista de tarefas
+> ![Captura de tela 2022-09-30 180426](https://user-images.githubusercontent.com/57846548/193356038-c61648f3-c65b-4c5d-866c-2207ac470e53.png) ![Captura de tela 2022-09-30 180451](https://user-images.githubusercontent.com/57846548/193356041-af37cbab-8e17-4f5d-88cb-f47a5898b79b.png)
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
