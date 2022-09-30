@@ -14,6 +14,13 @@ class _TodoListPageState extends State<TodoListPage> {
 
   List<Todo> todo = [];
 
+  void onDelete(Todo item) {
+    setState(() {
+      todo.remove(item);
+    });
+  }
+
+  bool errorText = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -23,12 +30,23 @@ class _TodoListPageState extends State<TodoListPage> {
               child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             child: Column(mainAxisSize: MainAxisSize.min, children: [
-              Row(children: [
+              Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Expanded(
                   child: TextField(
                     controller: _addController,
                     keyboardType: TextInputType.text,
+                    onChanged: (value) {
+                      value == ''
+                          ? setState(() {
+                              errorText = true;
+                            })
+                          : setState(() {
+                              errorText = false;
+                            });
+                    },
                     decoration: InputDecoration(
+                        errorText: errorText ? 'Campo vazio' : null,
+                        errorStyle: TextStyle(height: 0.5),
                         hoverColor: Color(0xff00d7f3),
                         prefixIcon: Icon(Icons.add_box),
                         focusedBorder: OutlineInputBorder(
@@ -50,9 +68,12 @@ class _TodoListPageState extends State<TodoListPage> {
                     String text = _addController.text;
                     Todo todoItem = Todo(title: text);
                     print(todo);
-                    setState(() {
-                      todo.add(todoItem);
-                    });
+                    if (_addController.text.isNotEmpty) {
+                      setState(() {
+                        todo.add(todoItem);
+                      });
+                      _addController.text = '';
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                       backgroundColor: Color(0xff00d7f3),
@@ -64,11 +85,13 @@ class _TodoListPageState extends State<TodoListPage> {
                 height: 5,
               ),
               SizedBox(
-                height: 640,
+                height: 630,
                 child: ListView.builder(
                     itemCount: todo.length,
-                    itemBuilder: (context, index) =>
-                        TodoListItem(todo: todo[(todo.length - 1) - index])),
+                    itemBuilder: (context, index) => TodoListItem(
+                          todo: todo[(todo.length - 1) - index],
+                          onDelete: onDelete,
+                        )),
               ),
               SizedBox(
                 height: 5,
@@ -96,3 +119,4 @@ class _TodoListPageState extends State<TodoListPage> {
     );
   }
 }
+// TodoListItem(todo: todo[(todo.length - 1) - index])
