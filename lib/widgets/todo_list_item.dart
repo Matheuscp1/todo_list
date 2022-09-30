@@ -38,6 +38,7 @@ class TodoListItem extends StatelessWidget {
                 ),
                 TextButton(
                   style: TextButton.styleFrom(
+                    foregroundColor: Colors.red,
                     textStyle: Theme.of(context).textTheme.labelLarge,
                   ),
                   child: const Text('Deletar'),

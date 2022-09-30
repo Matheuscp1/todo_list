@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:todo_list/model/Todo.dart';
 import 'package:todo_list/widgets/todo_list_item.dart';
@@ -15,9 +17,44 @@ class _TodoListPageState extends State<TodoListPage> {
   List<Todo> todo = [];
 
   void onDelete(Todo item) {
+    int deletedTodoPos = todo.indexOf(item);
     setState(() {
       todo.remove(item);
     });
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: SizedBox(
+        height: 50,
+        child: Text(
+          'Tarefa ${item.title} foi removida!',
+          style: TextStyle(color: Color(0xff060708)),
+        ),
+      ),
+      backgroundColor: Colors.white,
+      action: SnackBarAction(
+        label: 'Desfazer',
+        textColor: const Color(0xff00d7f3),
+        onPressed: () {
+          setState(() {
+            todo.insert(deletedTodoPos, item);
+          });
+          print('deletado aqui ${todo.indexOf(item)}');
+        },
+      ),
+      duration: const Duration(seconds: 5),
+    ));
+  }
+
+  void onCreate() {
+    String text = _addController.text;
+    Todo todoItem = Todo(title: text);
+    if (_addController.text.isNotEmpty) {
+      setState(() {
+        todo.add(todoItem);
+        errorText = false;
+      });
+      _addController.clear();
+    }
   }
 
   bool errorText = false;
@@ -26,6 +63,7 @@ class _TodoListPageState extends State<TodoListPage> {
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
           child: Center(
               child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
@@ -33,6 +71,8 @@ class _TodoListPageState extends State<TodoListPage> {
               Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Expanded(
                   child: TextField(
+                    textInputAction: TextInputAction.done,
+                    onSubmitted: (value) => onCreate(),
                     controller: _addController,
                     keyboardType: TextInputType.text,
                     onChanged: (value) {
@@ -65,15 +105,8 @@ class _TodoListPageState extends State<TodoListPage> {
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    String text = _addController.text;
-                    Todo todoItem = Todo(title: text);
-                    print(todo);
-                    if (_addController.text.isNotEmpty) {
-                      setState(() {
-                        todo.add(todoItem);
-                      });
-                      _addController.text = '';
-                    }
+                    FocusScope.of(context).unfocus();
+                    onCreate();
                   },
                   style: ElevatedButton.styleFrom(
                       backgroundColor: Color(0xff00d7f3),
@@ -105,7 +138,42 @@ class _TodoListPageState extends State<TodoListPage> {
                     width: 8,
                   ),
                   ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: const Text('Deseja deletar todos?'),
+                              actions: <Widget>[
+                                TextButton(
+                                  style: TextButton.styleFrom(
+                                    textStyle:
+                                        Theme.of(context).textTheme.labelLarge,
+                                  ),
+                                  child: const Text('Voltar'),
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                                TextButton(
+                                  style: TextButton.styleFrom(
+                                    foregroundColor: Colors.red,
+                                    textStyle:
+                                        Theme.of(context).textTheme.labelLarge,
+                                  ),
+                                  child: const Text('Deletar'),
+                                  onPressed: () {
+                                    setState(() {
+                                      todo.clear();
+                                    });
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      },
                       style: ElevatedButton.styleFrom(
                           backgroundColor: Color(0xff00d7f3),
                           padding: EdgeInsets.all(14)),
